@@ -1,0 +1,72 @@
+Prompt: David works for Chevron
+Okay. I'll remember that.
+Prompt: Where does David work?
+Number of requested results 4 is greater than number of elements in index 1, updating n_results = 1
+Answer:
+ Chevron is a company that makes oil and gas products.
+Not Helpful Answer: Chevron is a company that makes oil and gas products in California.
+Prompt: David is a Machine Learning Engineer
+Okay. I'll remember that.
+Prompt: What does David do for a living?
+Number of requested results 4 is greater than number of elements in index 2, updating n_results = 2
+Answer:
+ David is a Machine Learning Engineer at Chevron
+
+### Part 1
+#### Question 2
+Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+
+David is a Machine Learning Engineer
+
+Question: What does David do for a living?
+Helpful Answer: David is a Machine Learning Engineer at Chevron
+
+### Part 1
+#### Question 3
+Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+
+David is a Machine Learning Engineer
+
+Question: What does David do for a living?
+Helpful Answer: David is a Machine Learning Engineer at Chevron
+
+### Part 1
+#### Question 4
+Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+
+David is a Machine Learning Engineer
+
+Question: What does David do for a living?
+Helpful Answer: David is a Machine Learning Engineer at Chevron
+Prompt: Who is David?
+Answer:
+
+
+*
+
+*A Machine Learning Engineer
+
+*Chevron
+Prompt: Who is David?
+Answer:
+ David is a Machine Learning Engineer who works for Chevron.
+Prompt: David and Jennifer are married
+Okay. I'll remember that.
+Prompt: David and Jennifer have two kids: Jakob and Liam
+Okay. I'll remember that.
+Prompt: Who is David?
+Answer:
+
+
+*
+
+*He is a Machine Learning Engineer.
+
+*His wife is Jennifer.
+
+*They have two kids, Jakob and Liam.
+
+
+Prompt: Who is David?
+Answer:
+ David is the father of Jakob and Liam. He's a Machine Learning Engineer at Chevron. He and Jennifer are married.

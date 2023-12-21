@@ -1,4 +1,7 @@
 # Everybody's doing it, so why shouldn't I?
+
+Everybody is building an LLM, so why not me?
+
 ## My personal LLM experimentation Repo
 
 This is a WIP, "learning" chatbot. The idea behind this is to combine BERT text classification methods with a small LLM model to build out a chatbot that can effectively work. 
@@ -23,37 +26,21 @@ I'm running on a Mac M2, which makes LLM-things... unique. First off, there's no
 
 Install miniconda. 
 
+Run the following command:
 ```conda create -f ./environment.yml```
 
-### Example responses
+Run the learning-llm.py file. 
 
-#### Response 1
+### How to use
 
-> I am a software developer with nine years of experience, and have worked in various roles throughout the industry. I am currently a full-stack developer for a Fortune 50 company, and previously worked as an Associate Team Lead.
->
-> I have experience working in various industries, including energy and finance. I have also worked on large, complex projects with teams of varying sizes. I am familiar with multiple technologies and programming languages, including C#, JavaScript, Python, SQL, and more.
->
-> My strengths include my ability to quickly learn new technologies, as well as my ability to work independently or in a team setting. I have strong communication skills and the ability to effectively communicate with both technical and non-technical stakeholders. I am also proficient in agile development methodologies, including scrum and kanban.
->
-> In summary, I am an experienced software developer with a wide range of experience and skills. I am confident that my qualifications make me a strong candidate for the position you are advertising. Thank you for considering my application.
+In the current state, questions will trigger the LLM to generate a response based on the context of data already given to the LLM through declarative statements at the prompt. 
 
-#### Response 2
-
-> I have developed an extensive list of technical skills and experience over the course of my career in software development. I am a hard worker with a proven track record of delivering high-quality software on time. I am also a strong team leader who is able to manage multiple projects simultaneously.
->
-> My resume includes a variety of positions in different industries, including: 
->
-> • Lead Software Developer (Spot Traceability, Remote) 
->
-> • Associate Team Lead (JPMorgan Chase & Co., Houston) 
->
-> • Machine Learning Engineer (Chevron, Houston)
-> 
-> These experiences have given me the knowledge and skills to be a successful software engineer in your company. I am familiar with many different programming languages and frameworks, including JavaScript, Python, Java, C#, .NET Framework, etc. I have also developed a strong understanding of the latest technologies such as Big Data, Machine Learning, DevOps, Continuous Integration and Delivery, and Cloud Computing.
->
-> Additionally, I have experience working with various data structures and algorithms. I am able to analyze problems and develop solutions efficiently.
-> I am confident that I can make a positive impact on your company and look forward to the opportunity to discuss my qualifications further.
-
-# Question/Answer BERT Model
+### Question/Answer BERT Model
 
 https://sparknlp.org/2021/11/04/bert_sequence_classifier_question_statement_en.html
+
+### Todo
+
+* Improve chroma db query to give better/more context.
+* Classifier model to distinguish imperative statements from declarative
+* Chat context?

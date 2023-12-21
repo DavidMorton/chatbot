@@ -4,6 +4,7 @@ from langchain.vectorstores.chroma import Chroma
 from langchain.chains import RetrievalQA
 from langchain.chains.retrieval_qa.base import BaseRetrievalQA
 from langchain.llms.llamacpp import LlamaCpp
+from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_core.language_models import LLM
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from sentence_type_classifier import SentenceTypeClassifier
@@ -32,7 +33,8 @@ parameter_sets = {
         'n_batch': 512,
         'n_ctx': 4000,
         'n_gpu_layers': 1,
-        'repeat_penalty': 1.3
+        'repeat_penalty': 1.3,
+        'verbose': False
     }
 }
 
@@ -48,7 +50,10 @@ class ChatAny(LLM):
         **kwargs: Any,
     ) -> str:
         result = []
+        print("Answer:")
         for text in self.llm.stream(prompt):
+            if text.startswith('###'):
+                break
             result.append(text)
             print(text, end='')
         return ' '.join(text)
@@ -84,16 +89,19 @@ class Chatbot:
         if self._chain is None:
             retriever = self.db.as_retriever(search_kwargs={'kuname': 5})
 
+            llama = LlamaCpp(model_path=self._model_location, top_k=4, **self._model_parameters)
+
             llm = ChatAny(
-                llm=LlamaCpp(model_path=self._model_location, top_k=2, **self._model_parameters),
+                llm=llama,
                 db=self.db,
                 sentence_classifier=SentenceTypeClassifier('/Users/davidmorton/Downloads/bert_sequence_classifier_question_statement_en_3/', '.token'))
 
-            self._chain = RetrievalQA.from_chain_type(
+            retriever = VectorStoreRetriever(vectorstore=self.db)
+            
+            self._chain = RetrievalQA.from_llm(
                 llm=llm, 
-                chain_type="stuff", 
                 retriever=retriever,
-                verbose=True,
+                verbose=False
             )
 
         return self._chain
@@ -113,7 +121,7 @@ class Chatbot:
 
             chroma_path = f'./chromadb_learning/{basename}'
 
-            self._db = Chroma(persist_directory=chroma_path, embedding_function=llama)
+            self._db = Chroma(persist_directory=chroma_path, embedding_function=llama, collection_metadata={"hnsw:space": "cosine"})
 
         return self._db
     
@@ -134,7 +142,7 @@ class Chatbot:
         while prompt.lower() not in ['bye','exit','quit','goodbye']:
             if prompt.strip() != '':
                 self.query(prompt)
-            prompt = input('Prompt: ')
+            prompt = input('\n\n\nPrompt: ')
 
 m = LocalModels.LLAMA_13B.value
 
