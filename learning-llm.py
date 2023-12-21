@@ -47,9 +47,6 @@ class ChatAny(LLM):
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> str:
-        #prompt = prompt.replace("Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.", "Context:")
-        #prompt = prompt.replace("\nHelpful Answer:", "")
-        #result = self.llm(prompt, temperature  = 0.7,max_tokens=5000)['choices'][0]['text']
         result = []
         for text in self.llm.stream(prompt):
             result.append(text)
