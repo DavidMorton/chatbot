@@ -4,7 +4,7 @@ Everybody is building an LLM, so why not me?
 
 ## My personal LLM experimentation Repo
 
-This is a WIP, "learning" chatbot. The idea behind this is to combine BERT text classification methods with a small LLM model to build out a chatbot that can effectively work. 
+This is a WIP, "learning" chatbot. The idea behind this is to combine BERT text classification methods with a small LLM model to build out a chatbot that can effectively learn based on declarative statements fed to it straight from the prompt. 
 
 The pathway here is as follows:
 
