@@ -6,7 +6,9 @@ from langchain.chains.retrieval_qa.base import BaseRetrievalQA
 from langchain.llms.llamacpp import LlamaCpp
 from langchain_core.language_models import LLM
 from langchain_core.callbacks import CallbackManagerForLLMRun
-from .sentence_type_classifier import SentenceTypeClassifier
+from sentence_type_classifier import SentenceTypeClassifier
+from langchain.text_splitter import CharacterTextSplitter, SentenceTransformersTokenTextSplitter
+from langchain.document_loaders import TextLoader
 import os
 from enum import Enum
 import copy
@@ -29,14 +31,14 @@ parameter_sets = {
         'max_tokens': 5000,
         'n_batch': 512,
         'n_ctx': 4000,
-        'n_gpu_layers': 1
+        'n_gpu_layers': 1,
+        'repeat_penalty': 1.3
     }
 }
 
 class ChatAny(LLM):
     llm: LlamaCpp
     db: Chroma
-    sentence_classifier:SentenceTypeClassifier
 
     def _call(
         self,
@@ -45,11 +47,11 @@ class ChatAny(LLM):
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> str:
-        
-        print(f'PROMPT SUBMITTED TO MODEL\n {prompt}')
+        #prompt = prompt.replace("Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.", "Context:")
+        #prompt = prompt.replace("\nHelpful Answer:", "")
         #result = self.llm(prompt, temperature  = 0.7,max_tokens=5000)['choices'][0]['text']
         result = []
-        for text in self.llm.stream(prompt, stop=["Q:"]):
+        for text in self.llm.stream(prompt):
             result.append(text)
             print(text, end='')
         return ' '.join(text)
@@ -64,37 +66,48 @@ class Chatbot:
     _model_parameters:dict = None
     _db:Chroma = None
     _chain:BaseRetrievalQA = None
+    _classifier_path:str = None
+    _token_file:str = None
+    _classifier:SentenceTypeClassifier = None
 
-    def __init__(self, model_location:str, model_parameters:dict):
+    def __init__(self, model_location:str, model_parameters:dict, classifier_path:str, token_file:str):
         self._model_location = model_location
         self._model_parameters = model_parameters
+        self._classifier_path = classifier_path
+        self._token_file = token_file
 
     @property
+    def classifier(self):
+        if self._classifier is None:
+            self._classifier = SentenceTypeClassifier(self._classifier_path, self._token_file)
+        return self._classifier
+    
+    @property
     def chain(self):
-        retriever = self.db.as_retriever(search_kwargs={'kuname': 5})
+        if self._chain is None:
+            retriever = self.db.as_retriever(search_kwargs={'kuname': 5})
 
-        llm = ChatAny(
-            llm=LlamaCpp(model_path=self._model_location, **self._model_parameters),
-            db=self.db,
-            sentence_classifier=SentenceTypeClassifier('/Users/davidmorton/Downloads/bert_sequence_classifier_question_statement_en_3/', '.token'))
+            llm = ChatAny(
+                llm=LlamaCpp(model_path=self._model_location, top_k=2, **self._model_parameters),
+                db=self.db,
+                sentence_classifier=SentenceTypeClassifier('/Users/davidmorton/Downloads/bert_sequence_classifier_question_statement_en_3/', '.token'))
 
-        chain = RetrievalQA.from_chain_type(
-            llm=llm, 
-            chain_type="stuff", 
-            retriever=retriever,
-            verbose=True,
-        )
+            self._chain = RetrievalQA.from_chain_type(
+                llm=llm, 
+                chain_type="stuff", 
+                retriever=retriever,
+                verbose=True,
+            )
 
-        return chain
+        return self._chain
 
     @property
     def db(self):
         if self._db is None:
             parameters = copy.deepcopy(self._model_parameters)
-
-            disallowed_tokens = ['max_tokens', 'temperature']
-            for k in disallowed_tokens:
-                if k in parameters:
+            allowed_tokens = list(LlamaCppEmbeddings.__fields__.keys())
+            for k in self._model_parameters:
+                if k not in allowed_tokens:
                     del parameters[k]
 
             llama = LlamaCppEmbeddings(model_path=self._model_location, **parameters)   
@@ -107,13 +120,31 @@ class Chatbot:
 
         return self._db
     
+    def add_information(self, text):
+        self.db.add_texts([text])
+    
     def query(self, prompt:str):
-        return self.chain.run(prompt)
+        classification_result = self.classifier.classify(prompt)
+        if classification_result == 1:
+            return self.chain.run(prompt)
+        
+        self.add_information(prompt)
+        print('Okay. I\'ll remember that.')
+        return 'Okay. I\'ll remember that.'
+    
+    def start_chat(self):
+        prompt = ''
+        while prompt.lower() not in ['bye','exit','quit','goodbye']:
+            if prompt.strip() != '':
+                self.query(prompt)
+            prompt = input('Prompt: ')
 
 m = LocalModels.LLAMA_13B.value
 
-chatbot:Chatbot = Chatbot(os.path.join('/Users/davidmorton/source/models/', m), parameter_sets[m])
+chatbot:Chatbot = Chatbot(
+    os.path.join('/Users/davidmorton/source/models/', m), 
+    parameter_sets[m], 
+    "shahrukhx01/question-vs-statement-classifier", 
+    '.token')
 
-result = chatbot.query('Who is Abraham Lincoln?')
-
-print(result)
+chatbot.start_chat()

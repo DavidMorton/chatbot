@@ -7,3 +7,4 @@ spaadia_release_v02
 chromadb_learning
 .DS_Store
 cv.txt
+*.pyc
