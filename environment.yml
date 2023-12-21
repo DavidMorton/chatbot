@@ -1,0 +1,25 @@
+name: mlenv
+channels:
+  - defaults
+  - conda-forge
+  - apple
+  - pytorch-nightly
+  - huggingface
+dependencies:
+  - python==3.8.18
+  - pip:
+      - numpy
+      - requests
+      - sentencepiece
+      - torch
+      - torchaudio
+      - torchvision
+      - chromadb
+      - sentence-transformers
+      - llama-cpp-python
+      - tensorflow-macos
+      - tensorflow-metal
+      - langchain
+      - nltk
+      - pandas
+prefix: /Users/davidmorton/miniconda3/envs/cuda-pytorch
